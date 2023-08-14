@@ -29,19 +29,19 @@ public class Book {
     @Override
     public String toString() {
         return "{" +
-                " Название книги :'" + this.name + "\r\n" +
-                " Автор :'" + this.author + "\r\n" +
-                " Формат :'" + this.format + "\r\n" +
-                " Год :'" + this.year + "\r\n" +
-                " Жанр :'" + this.genre + "\r\n" +
-                " Описание :'" + this.description + "\r\n" +
-                " Расположение :'" + this.location + "\r\n" +
+                " Название книги : " + this.name + "\r\n" +
+                " Автор : " + this.author + "\r\n" +
+                " Формат : " + this.format + "\r\n" +
+                " Год : " + this.year + "\r\n" +
+                " Жанр : " + this.genre + "\r\n" +
+                " Описание : " + this.description + "\r\n" +
+                " Расположение : " + this.location + "\r\n" +
                 '}';
     }
 
     public String search(String x2) {
         String x = "0";
-        if (this.name.equals(x2) == true)
+        if (this.name.equals(x2))
             x = "1";
         return x;
     }

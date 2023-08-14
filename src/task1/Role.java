@@ -14,36 +14,38 @@ public class Role {
     public Role() {
     }
 
-    public String authorization(String name, String password) throws Exception {
-        String s3 = "", sc1 = "", sc2 = "";
+    public String search(String name, String password) throws Exception {
+        String skipLine = "";
+        String isAdmin = "";
+        String readName = "";
+        String readPassword = "";
         boolean bol = false;
         FileReader fr = new FileReader("src\\task1\\resources\\Password.txt");
         Scanner scan2 = new Scanner(fr);
-        while (bol == false && scan2.hasNextLine()) {
-            s3 = scan2.nextLine();
-            sc1 = scan2.nextLine();
-            sc2 = scan2.nextLine();
+        while (!bol && scan2.hasNextLine()) {
+            skipLine = scan2.nextLine();
+            isAdmin = scan2.nextLine();
+            readName = scan2.nextLine();
+            readPassword = scan2.nextLine();
             scan2.nextLine();
-            if (name.equals(sc1) && password.hashCode() == Integer.parseInt(sc2)) {
+            if (name.equals(readName) && password.hashCode() == Integer.parseInt(readPassword)) {
                 bol = true;
                 System.out.println(AUTHORIZATION);
             }
         }
-        if (bol == false) {
+        if (!bol) {
             System.out.println(PASSWORD_OR_LOGIN_ERROR);
-            s3 = "0";
         }
         scan2.close();
-        return s3;
+        return isAdmin;
     }
 
     public void registration(String name, String password, String email) throws Exception {
         FileWriter nFile = new FileWriter("src\\task1\\resources\\Password.txt", true);
-        nFile.write(System.lineSeparator());
-        nFile.write(System.lineSeparator() + "2645995" + System.lineSeparator());
+        nFile.write(System.lineSeparator() + "false" + System.lineSeparator());
         nFile.write(name + System.lineSeparator());
         nFile.write(password.hashCode() + System.lineSeparator());
-        nFile.write(email);
+        nFile.write(email + System.lineSeparator());
         nFile.close();
     }
 
