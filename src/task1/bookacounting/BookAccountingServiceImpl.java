@@ -1,5 +1,8 @@
 package src.task1.bookacounting;
 
+import src.task1.Book;
+import src.task1.Role;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -7,30 +10,28 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
 
-import src.task1.Role;
-import src.task1.Book;
-
 import static src.task1.MessageConstant.*;
 
 public class BookAccountingServiceImpl implements BookAccountingService {
-    public static void booksAccount() throws Exception {
+    public void startMyBooksLibraryService() throws Exception {
         Scanner scan = new Scanner(System.in);
         int choice;
         while (true) {
             do {
                 System.out.println(GREETING);
-                while (!scan.hasNextInt()) {
+
+                while (!scan.hasNextInt() || (scan.nextInt() < 0 && scan.nextInt() > 3)) { // todo extract to method
                     scan.nextLine();
                 }
                 choice = scan.nextInt();
-
             } while (choice < 0 || choice > 3);
+
             switch (choice) {
-                case 1:
-                    BookAccountingServiceImpl.registration();
+                case 1: // todo resolve magic number issue
+                    registration();
                     break;
                 case 2:
-                    BookAccountingServiceImpl.authorization();
+                    authorization();
                     break;
                 case 0:
                     System.out.println(GOODBYE);
@@ -39,23 +40,23 @@ public class BookAccountingServiceImpl implements BookAccountingService {
         }
     }
 
-    public static void userMenu() throws Exception {
+    public void userMenu() throws Exception { // todo all method names should be verbs, also process exceptions inside each method, don't throw it outside
         Scanner scan = new Scanner(System.in);
         int choice;
         while (true) {
             do {
                 System.out.println(USER_ACCESS_RIGHTS);
-                while (!scan.hasNextInt()) {
+                while (!scan.hasNextInt()) { // todo add same check as above
                     scan.nextLine();
                 }
                 choice = scan.nextInt();
             } while (choice < 0 || choice > 2);
             switch (choice) {
                 case 1:
-                    BookAccountingServiceImpl.watchCatalog();
+                    watchCatalog();
                     break;
                 case 2:
-                    BookAccountingServiceImpl.bookSearch();
+                    bookSearch();
                     break;
                 case 0:
                     return;
@@ -63,7 +64,7 @@ public class BookAccountingServiceImpl implements BookAccountingService {
         }
     }
 
-    public static void adminMenu() throws Exception {
+    public void adminMenu() throws Exception {
         Scanner scan = new Scanner(System.in);
         int choice;
         while (true) {
@@ -73,19 +74,19 @@ public class BookAccountingServiceImpl implements BookAccountingService {
                     scan.nextLine();
                 }
                 choice = scan.nextInt();
-            } while (choice < 0 || choice > 4);
+            } while (choice < 0 || choice > 4); // todo same as above
             switch (choice) {
                 case 1:
-                    BookAccountingServiceImpl.watchCatalog();
+                    watchCatalog();
                     break;
                 case 2:
-                    BookAccountingServiceImpl.bookSearch();
+                    bookSearch();
                     break;
                 case 3:
-                    BookAccountingServiceImpl.bookAdd();
+                    bookAdd();
                     break;
                 case 4:
-                    BookAccountingServiceImpl.bookRemoved();
+                    bookRemoved();
                     break;
                 case 0:
                     return;
@@ -93,53 +94,46 @@ public class BookAccountingServiceImpl implements BookAccountingService {
         }
     }
 
-    public static void registration() throws Exception {
+    public void registration() throws Exception {
         Role R1 = new Role();
         Scanner scan = new Scanner(System.in);
-        String password = "";
-        String email = "";
-        String name = "";
         System.out.println(ENTER_NAME);
-        name = scan.next();
+        String name = scan.next();
         scan.nextLine();
         System.out.println(ENTER_PASSWORD);
-        password = scan.nextLine();
+        String password = scan.nextLine();
         System.out.println(ENTER_EMAIL);
-        email = scan.nextLine();
+        String email = scan.nextLine();
         R1.registration(name, password, email);
         System.out.println(ACCOUNT_CREATED);
     }
 
-    public static void authorization() throws Exception {
-        String name = "";
-        String password = "";
-        String pas = "";
+    public void authorization() throws Exception {
         Role R1 = new Role();
         Scanner scan = new Scanner(System.in);
         System.out.println(ENTER_NAME);
-        name = scan.next();
+        String name = scan.next();
         scan.nextLine();
         System.out.println(ENTER_PASSWORD);
-        password = scan.nextLine();
-        pas = R1.search(name, password);
+        String password = scan.nextLine();
+        String pas = R1.search(name, password);
         if (pas.equals("true")) {
-            BookAccountingServiceImpl.adminMenu();
+            adminMenu();
         }
         if (pas.equals("false")) {
-            BookAccountingServiceImpl.userMenu();
+            userMenu();
         }
     }
 
-    public static void bookSearch() throws Exception {
+    public void bookSearch() throws Exception {
         List<Book> books;
-        books = BookAccountingServiceImpl.variables();
-        String bookTitle = "";
-        boolean bol = false;
+        books = getBooksFromFile();
         Scanner scan = new Scanner(System.in);
         System.out.println(ENTER_BOOK_TITLE);
-        bookTitle = scan.nextLine();
+        String bookTitle = scan.nextLine();
+        boolean bol = false;
         for (Book book : books) {
-            if (Objects.equals(book.search(bookTitle), "1")) {
+            if (Objects.equals(book.getName(), bookTitle)) {
                 System.out.println(BOOK_FOUND);
                 System.out.println(book);
                 bol = true;
@@ -150,17 +144,16 @@ public class BookAccountingServiceImpl implements BookAccountingService {
         }
     }
 
-    public static void bookRemoved() throws Exception {
+    public void bookRemoved() throws Exception {
         Book R2 = new Book();
         List<Book> books;
-        books = BookAccountingServiceImpl.variables();
-        String bookTitle = "";
-        boolean bol = false;
-        Scanner scan = new Scanner(System.in);
+        books = getBooksFromFile();
+        Scanner scanner = new Scanner(System.in);
         System.out.println(ENTER_BOOK_TITLE);
-        bookTitle = scan.nextLine();
+        String bookTitle = scanner.nextLine();
+        boolean bol = false;
         for (Book book : books) {
-            if (Objects.equals(book.search(bookTitle), "1")) {
+            if (Objects.equals(book.getName(), bookTitle)) {
                 bol = true;
                 books.remove(book);
                 System.out.println(BOOK_REMOVED);
@@ -177,33 +170,26 @@ public class BookAccountingServiceImpl implements BookAccountingService {
         }
     }
 
-    public static void bookAdd() throws Exception {
+    public void bookAdd() throws Exception {
         Book R2 = new Book();
         List<Book> books;
-        books = BookAccountingServiceImpl.variables();
-        String bookTitle = "";
-        String author = "";
-        String format = "";
-        String year = "";
-        String genre = "";
-        String description = "";
-        String location = "";
-        Scanner scan = new Scanner(System.in);
+        books = getBooksFromFile();
+        Scanner scanner = new Scanner(System.in);
         System.out.println(ENTER_BOOK_TITLE);
-        bookTitle = scan.next();
-        scan.nextLine();
+        String bookTitle = scanner.next();
+        scanner.nextLine();
         System.out.println(ENTER_AUTHOR);
-        author = scan.nextLine();
+        String author = scanner.nextLine();
         System.out.println(ENTER_BOOK_FORMAT);
-        format = scan.nextLine();
+        String format = scanner.nextLine();
         System.out.println(ENTER_YEAR_OF_CREATION);
-        year = scan.nextLine();
+        String year = scanner.nextLine();
         System.out.println(ENTER_GENRE);
-        genre = scan.nextLine();
+        String genre = scanner.nextLine();
         System.out.println(ENTER_DESCRIPTION);
-        description = scan.nextLine();
+        String description = scanner.nextLine();
         System.out.println(ENTER_BOOK_LOCATION);
-        location = scan.nextLine();
+        String location = scanner.nextLine();
         Book objBooks = new Book(bookTitle, author, format, Integer.parseInt(year), genre, description, location);
         books.add(objBooks);
         R2.delFile();
@@ -213,21 +199,21 @@ public class BookAccountingServiceImpl implements BookAccountingService {
         }
     }
 
-    public static List<Book> variables() throws FileNotFoundException {
+    private List<Book> getBooksFromFile() throws FileNotFoundException {
         List<Book> books = new ArrayList<>();
         FileReader fileReader = new FileReader("src\\task1\\resources\\Books.txt");
-        Scanner scan3 = new Scanner(fileReader);
-        while (scan3.hasNextLine()) {
-            Book objBooks = new Book(scan3.nextLine(), scan3.nextLine(), scan3.nextLine(),
-                    Integer.parseInt(scan3.nextLine()), scan3.nextLine(), scan3.nextLine(), scan3.nextLine());
+        Scanner scanner = new Scanner(fileReader);
+        while (scanner.hasNextLine()) {
+            Book objBooks = new Book(scanner.nextLine(), scanner.nextLine(), scanner.nextLine(),
+                    Integer.parseInt(scanner.nextLine()), scanner.nextLine(), scanner.nextLine(), scanner.nextLine());
             books.add(objBooks);
         }
         return books;
     }
 
-    public static void watchCatalog() throws FileNotFoundException {
+    public void watchCatalog() throws FileNotFoundException {
         List<Book> books;
-        books = BookAccountingServiceImpl.variables();
+        books = getBooksFromFile();
         for (Book book : books) {
             System.out.println(book);
         }

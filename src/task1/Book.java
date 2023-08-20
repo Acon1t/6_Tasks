@@ -39,12 +39,7 @@ public class Book {
                 '}';
     }
 
-    public String search(String x2) {
-        String x = "0";
-        if (this.name.equals(x2))
-            x = "1";
-        return x;
-    }
+
 
     public void delFile() throws Exception {
         FileWriter nFile = new FileWriter("src\\task1\\resources\\Books.txt", false);
