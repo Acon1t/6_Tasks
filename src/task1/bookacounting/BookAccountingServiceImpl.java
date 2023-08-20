@@ -14,24 +14,16 @@ import static src.task1.MessageConstant.*;
 
 public class BookAccountingServiceImpl implements BookAccountingService {
     public void startMyBooksLibraryService() throws Exception {
-        Scanner scan = new Scanner(System.in);
         int choice;
         while (true) {
-            do {
-                System.out.println(GREETING);
-
-                while (!scan.hasNextInt() || (scan.nextInt() < 0 && scan.nextInt() > 3)) { // todo extract to method
-                    scan.nextLine();
-                }
-                choice = scan.nextInt();
-            } while (choice < 0 || choice > 3);
-
+            System.out.println(GREETING);
+            choice = helpSwitch(0, 2);
             switch (choice) {
-                case 1: // todo resolve magic number issue
-                    registration();
+                case 1:
+                    register();
                     break;
                 case 2:
-                    authorization();
+                    logIn();
                     break;
                 case 0:
                     System.out.println(GOODBYE);
@@ -40,17 +32,25 @@ public class BookAccountingServiceImpl implements BookAccountingService {
         }
     }
 
-    public void userMenu() throws Exception { // todo all method names should be verbs, also process exceptions inside each method, don't throw it outside
-        Scanner scan = new Scanner(System.in);
+
+    public int helpSwitch(int first, int second) {
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+        do {
+            while (!scanner.hasNextInt()) {
+                scanner.nextLine();
+            }
+            choice = scanner.nextInt();
+        } while (choice < first || choice > second);
+        return choice;
+    }
+
+
+    public void startUserMenu() throws Exception {
         int choice;
         while (true) {
-            do {
-                System.out.println(USER_ACCESS_RIGHTS);
-                while (!scan.hasNextInt()) { // todo add same check as above
-                    scan.nextLine();
-                }
-                choice = scan.nextInt();
-            } while (choice < 0 || choice > 2);
+            System.out.println(USER_ACCESS_RIGHTS);
+            choice = helpSwitch(0, 2);
             switch (choice) {
                 case 1:
                     watchCatalog();
@@ -64,17 +64,12 @@ public class BookAccountingServiceImpl implements BookAccountingService {
         }
     }
 
-    public void adminMenu() throws Exception {
-        Scanner scan = new Scanner(System.in);
+
+    public void startAdminMenu() throws Exception {
         int choice;
         while (true) {
-            do {
-                System.out.println(ADMINISTRATOR_ACCESS_RIGHTS);
-                while (!scan.hasNextInt()) {
-                    scan.nextLine();
-                }
-                choice = scan.nextInt();
-            } while (choice < 0 || choice > 4); // todo same as above
+            System.out.println(ADMINISTRATOR_ACCESS_RIGHTS);
+            choice = helpSwitch(0, 4);
             switch (choice) {
                 case 1:
                     watchCatalog();
@@ -86,7 +81,7 @@ public class BookAccountingServiceImpl implements BookAccountingService {
                     bookAdd();
                     break;
                 case 4:
-                    bookRemoved();
+                    bookRemove();
                     break;
                 case 0:
                     return;
@@ -94,7 +89,7 @@ public class BookAccountingServiceImpl implements BookAccountingService {
         }
     }
 
-    public void registration() throws Exception {
+    public void register() throws Exception {
         Role R1 = new Role();
         Scanner scan = new Scanner(System.in);
         System.out.println(ENTER_NAME);
@@ -108,7 +103,7 @@ public class BookAccountingServiceImpl implements BookAccountingService {
         System.out.println(ACCOUNT_CREATED);
     }
 
-    public void authorization() throws Exception {
+    public void logIn() throws Exception {
         Role R1 = new Role();
         Scanner scan = new Scanner(System.in);
         System.out.println(ENTER_NAME);
@@ -116,12 +111,12 @@ public class BookAccountingServiceImpl implements BookAccountingService {
         scan.nextLine();
         System.out.println(ENTER_PASSWORD);
         String password = scan.nextLine();
-        String pas = R1.search(name, password);
-        if (pas.equals("true")) {
-            adminMenu();
+        String isAdmin = R1.search(name, password);
+        if (isAdmin.equals("true")) {
+            startAdminMenu();
         }
-        if (pas.equals("false")) {
-            userMenu();
+        if (isAdmin.equals("false")) {
+            startUserMenu();
         }
     }
 
@@ -131,30 +126,30 @@ public class BookAccountingServiceImpl implements BookAccountingService {
         Scanner scan = new Scanner(System.in);
         System.out.println(ENTER_BOOK_TITLE);
         String bookTitle = scan.nextLine();
-        boolean bol = false;
+        boolean condition = false;
         for (Book book : books) {
             if (Objects.equals(book.getName(), bookTitle)) {
                 System.out.println(BOOK_FOUND);
                 System.out.println(book);
-                bol = true;
+                condition = true;
             }
         }
-        if (!bol) {
+        if (!condition) {
             System.out.println(NO_RESULTS_FOR_YOUR_SEARCH);
         }
     }
 
-    public void bookRemoved() throws Exception {
+    public void bookRemove() throws Exception {
         Book R2 = new Book();
         List<Book> books;
         books = getBooksFromFile();
         Scanner scanner = new Scanner(System.in);
         System.out.println(ENTER_BOOK_TITLE);
         String bookTitle = scanner.nextLine();
-        boolean bol = false;
+        boolean condition = false;
         for (Book book : books) {
             if (Objects.equals(book.getName(), bookTitle)) {
-                bol = true;
+                condition = true;
                 books.remove(book);
                 System.out.println(BOOK_REMOVED);
                 R2.delFile();
@@ -165,7 +160,7 @@ public class BookAccountingServiceImpl implements BookAccountingService {
                 break;
             }
         }
-        if (!bol) {
+        if (!condition) {
             System.out.println(NO_RESULTS_FOR_YOUR_SEARCH);
         }
     }

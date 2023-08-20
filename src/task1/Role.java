@@ -19,21 +19,21 @@ public class Role {
         String isAdmin = "";
         String readName = "";
         String readPassword = "";
-        boolean bol = false;
+        boolean condition = false;
         FileReader fr = new FileReader("src\\task1\\resources\\Password.txt");
         Scanner scan2 = new Scanner(fr);
-        while (!bol && scan2.hasNextLine()) {
+        while (!condition && scan2.hasNextLine()) {
             skipLine = scan2.nextLine();
             isAdmin = scan2.nextLine();
             readName = scan2.nextLine();
             readPassword = scan2.nextLine();
             scan2.nextLine();
             if (name.equals(readName) && password.hashCode() == Integer.parseInt(readPassword)) {
-                bol = true;
+                condition = true;
                 System.out.println(AUTHORIZATION);
             }
         }
-        if (!bol) {
+        if (!condition) {
             System.out.println(PASSWORD_OR_LOGIN_ERROR);
         }
         scan2.close();

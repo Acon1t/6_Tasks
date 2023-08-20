@@ -40,7 +40,6 @@ public class Book {
     }
 
 
-
     public void delFile() throws Exception {
         FileWriter nFile = new FileWriter("src\\task1\\resources\\Books.txt", false);
         nFile.write("");
